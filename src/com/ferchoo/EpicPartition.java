@@ -1,6 +1,7 @@
 package com.ferchoo;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 public class EpicPartition {
     public String createPartition(int N) {
@@ -9,79 +10,190 @@ public class EpicPartition {
             return "";
         }
 
-        String placeholder = new String();
+        String str = "";
 
-        return permutation(placeholder, N,' ');
+        for (int i = 0; i<N*6/3; i++){
+            str = str.concat("abc");
+        }
+
+        char[] sortedStr = str.toCharArray();
+
+        sortedPermutations(sortedStr);
+
+        str = Arrays.toString(sortedStr);
+
+        return str;
     }
 
-    public String permutation (String permute, int N, char next){
+    public String checkString (char[] permute){
 
-        char localPermute[] = permute.toCharArray();
-        String newPermute = new String (permute.toString());
+        char[] localPermute = permute;
 
         // count a's b's and c's
+        int index = 1;
+        int sumA = 0;
+        int sumB = 0;
+        int sumC = 0;
         int aCount=0;
         int bCount=0;
         int cCount=0;
 
         for (char element:localPermute) {
-            if (element == 'a') aCount++;
-            else if (element == 'b') bCount++;
-            else if (element == 'c') cCount++;
+            if (element == 'a') {
+                aCount++;
+                sumA =+ index;
+            }
+            else if (element == 'b') {
+                bCount++;
+                sumB =+ index;
+            }
+            else if (element == 'c') {
+                cCount++;
+                sumC =+ index;
+            }
             else return "FALLA LOCA";
+            index++;
         }
 
         // System.out.printf("%d %d %d \n",aCount,bCount,cCount);
         // System.out.println(newPermute.toString());
+        // System.out.printf("%d %d %d> " + newPermute.toString() + "\n",aCount,bCount,cCount);
+        // System.out.printf("COUNTS: %d %d %d SUMS: %d %d %d >" + permute.toString() + "\n", aCount,bCount,cCount,sumA, sumB, sumC);
 
-        ;
-        if ((aCount+bCount+cCount) < (6*N)) {
-            switch (next){
-                case 'a': newPermute = newPermute.concat("a");aCount++;
-                    break;
-                case 'b': newPermute = newPermute.concat("b");bCount++;
-                    break;
-                case 'c': newPermute = newPermute.concat("c");cCount++;
-                    break;
-            }
-            int MAX = 6*N/3;
-
-            //System.out.printf("%d %d %d> " + newPermute.toString() + "\n",aCount,bCount,cCount);
-
-            if (aCount < MAX) permutation(newPermute, N,'a');
-            if (bCount < MAX) permutation(newPermute, N,'b');
-            if (cCount < MAX) permutation(newPermute, N,'c');
-
-            if ( (aCount+bCount+cCount) == 6*N){
-
-                //Combination is maxed so evaluate for success criteria
-
-                int index = 1;
-                int sumA = 0;
-                int sumB = 0;
-                int sumC = 0;
-
-                //make the sum based on the permutation string
-                for (char element : localPermute) {
-                    if (element == 'a') sumA = +index++;
-                    else if (element == 'b') sumB = +index++;
-                    else if (element == 'c') sumC = +index++;
-                }
-                // for debugging
-                //System.out.printf("SUMS: %d %d %d >" + newPermute.toString() + "\n", sumA, sumB, sumC);
-
-                // Additionally, this partition must be such that sum(C) = 2 * sum(A) = 2 * sum(B).
-                if ((sumC == 2 * sumA) && (sumC == 2 * sumB)) {
-                    System.out.printf("SUMS: %d %d %d >" + newPermute.toString() + "\n", sumA, sumB, sumC);
-                    System.out.println("Bingo!!!"+newPermute.toString());
-                    return permute;
-                } else
-                    return ""; // not a good case
-            }
+        // Additionally, this partition must be such that sum(C) = 2 * sum(A) = 2 * sum(B).
+        if ((sumC == 2 * sumA) && (sumC == 2 * sumB)) {
+            System.out.printf("SUMS: %d %d %d >" + Arrays.toString(permute) + "\n", sumA, sumB, sumC);
+            System.out.println("Bingo!!!" + Arrays.toString(permute));
+            return Arrays.toString(permute);
         }
 
         return "";
     }
+
+    /**
+     * permutation function
+     * @param str string to calculate permutation for
+     * @param l starting index
+     * @param r end index
+     */
+    private void permute(String str, int l, int r)
+    {
+        if (l == r)
+            checkString(str.toCharArray());
+        else
+        {
+            for (int i = l; i <= r; i++)
+            {
+                str = swap(str,l,i);
+                permute(str, l+1, r);
+                str = swap(str,l,i);
+            }
+        }
+    }
+
+    /**
+     * Swap Characters at position
+     * @param a string value
+     * @param i position 1
+     * @param j position 2
+     * @return swapped string
+     */
+    public String swap(String a, int i, int j)
+    {
+        char temp;
+        char[] charArray = a.toCharArray();
+        temp = charArray[i] ;
+        charArray[i] = charArray[j];
+        charArray[j] = temp;
+        return String.valueOf(charArray);
+    }
+
+    // A utility function two swap two characters
+    // a and b
+    void swap(char str[], int a, int b)
+    {
+        char t = str[a];
+	    str[a] = str[b];
+	    str[b] = t;
+    }
+
+    // This function finds the index of the
+    // smallest character which is greater
+    // than 'first' and is present in str[l..h]
+    int findCeil(char str[], char first, int l, int h)
+    {
+        // initialize index of ceiling element
+        int ceilIndex = l;
+
+        // Now iterate through rest of the
+        // elements and find the smallest
+        // character greater than 'first'
+        for (int i = l + 1; i <= h; i++)
+            if (str[i] > first && str[i] < str[ceilIndex])
+                ceilIndex = i;
+
+        return ceilIndex;
+    }
+
+    // Print all permutations of str in sorted order
+    void sortedPermutations(char str[])
+    {
+        // Get size of string
+        int size = str.length;
+
+        // Sort the string in increasing order
+        //qsort(str, size, sizeof(str[0]), compare);
+        Arrays.parallelSort(str);
+
+        // Print permutations one by one
+        boolean isFinished = false;
+
+
+        long x = 1;
+
+        while (!isFinished) {
+
+            // print this permutation if matches the criteria
+            String result = checkString(str);
+            System.out.printf("%d \r",x++);
+            //System.out.printf("%d "+Arrays.toString(str)+"\n", x++);
+
+            // Find the rightmost character
+            // which is smaller than its next
+            // character. Let us call it 'first
+            // char'
+            int i;
+            for (i = size - 2; i >= 0; --i)
+                if (str[i] < str[i + 1])
+                    break;
+
+            // If there is no such character, all
+            // are sorted in decreasing order,
+            // means we just printed the last
+            // permutation and we are done.
+            if (i == -1)
+                isFinished = true;
+            else {
+
+                // Find the ceil of 'first char'
+                // in right of first character.
+                // Ceil of a character is the
+                // smallest character greater
+                // than it
+                int ceilIndex = findCeil(str,
+                        str[i], i + 1, size - 1);
+
+                // Swap first and second characters
+                swap(str,i, ceilIndex);
+
+                // Sort the string on right of 'first char'
+                Arrays.parallelSort(str, i+1, str.length);
+                // in C: qsort(str + i + 1, size - i - 1,sizeof(str[0]), compare);
+            }
+        }
+    }
+
+
 }
 
 /*
